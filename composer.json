@@ -1,6 +1,8 @@
 {
     "name": "juaguz/apigenerator",
     "description": "automated generators api",
+    "keywords": ["laravel"],
+
     "authors": [
         {
             "name": "JG",
