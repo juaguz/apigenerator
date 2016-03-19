@@ -2,6 +2,8 @@
     "name": "juaguz/apigenerator",
     "description": "automated generators api",
     "keywords": ["laravel","api","juaguz"],
+    "minimum-stability": "dev",
+
 
     "authors": [
         {
@@ -16,11 +18,6 @@
     "autoload": {
         "psr-4": {
             "JuaGuz/ApiGenerator": "src/"
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "master"
         }
     }
 
