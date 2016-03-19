@@ -1,0 +1,19 @@
+{
+    "name": "juaguz/apigenerator",
+    "description": "automated generators api",
+    "authors": [
+        {
+            "name": "JG",
+            "email": "juanguzman91@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "illuminate/support": "5.1.*|5.2.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "JuaGuz/ApiGenerator": "src/"
+        }
+    }
+}
