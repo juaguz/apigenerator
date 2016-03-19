@@ -1,8 +1,8 @@
-<?php echo "<?php" ?> namespace App\Microvoz\Entities\<?php echo $NAMESPACE ?>;
+<?php echo "<?php" ?> namespace App\Api\Entities\<?php echo $NAMESPACE ?>;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Microvoz\Interfaces\ApiModelInterface;
+use JuaGuz\ApiGenerator\Interfaces\ApiModelInterface;
 
 class <?php echo $NAME ?> extends Model implements ApiModelInterface{
 	use SoftDeletes;

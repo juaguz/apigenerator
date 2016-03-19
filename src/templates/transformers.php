@@ -1,6 +1,6 @@
-<?php echo "<?php namespace App\Microvoz\Transformers;" ?>
+<?php echo "<?php namespace App\Api\Transformers;" ?>
 
-
+use JuaGuz\ApiGenerator\BaseTransformer;
 class <?php echo $NAME?>Transformer extends BaseTransformer
 {
 

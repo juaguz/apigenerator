@@ -2,7 +2,7 @@
 
 use App\Microvoz\Entities\<?php echo $NAMESPACE ?>\<?php echo $MODEL ?> as Model;
 use App\Microvoz\Transformers\<?php echo $MODEL ?>Transformer as Transformer;
-use App\Microvoz\Clases\Api;
+use JuaGuz\ApiGenerator\Clases\Api;
 
 
 class <?php echo $NAME?>Controller extends Api
