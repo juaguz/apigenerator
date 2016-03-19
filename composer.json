@@ -15,5 +15,7 @@
         "psr-4": {
             "JuaGuz/ApiGenerator": "src/"
         }
-    }
+    },
+    "minimum-stability": "dev",
+
 }
