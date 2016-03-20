@@ -3,7 +3,7 @@
 use Illuminate\Routing\Router;
 use Illuminate\Session\SessionManager;
 
-use Juaguz\ApiGenerator\Console\GenerateApi;
+
 
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
@@ -43,7 +43,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
 
         $this->app['command.api.generate'] = $this->app->share(
             function ($app) {
-                return new GenerateApi();
+                return new Console\GenerateApi();
             }
         );
 
