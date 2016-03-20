@@ -3,7 +3,8 @@
     "description": "automated generators api",
     "keywords": ["laravel","api","juaguz"],
     "minimum-stability": "dev",
-
+    "license": "MIT",
+    "type": "library",
 
     "authors": [
         {
