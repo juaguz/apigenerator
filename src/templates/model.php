@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use JuaGuz\ApiGenerator\Interfaces\ApiModelInterface;
+use JuaGuz\ApiGenerator\ApiModelInterface;
 
 class <?php echo $NAME ?> extends Model implements ApiModelInterface{
 	use SoftDeletes;
