@@ -3,7 +3,7 @@
 use Illuminate\Routing\Router;
 use Illuminate\Session\SessionManager;
 
-use ApiGenerator\Console\GenerateApi;
+use Juaguz\ApiGenerator\Console\GenerateApi;
 
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
