@@ -1,5 +1,4 @@
-<?php 
-namespace JuaGuz\ApiGenerator;
+<?php namespace JuaGuz\ApiGenerator;
 
 use Illuminate\Http\Response as IlluminateResponse;
 use App\Http\Controllers\Controller as Controller;

@@ -1,5 +1,4 @@
-<?php 
-namespace JuaGuz\ApiGenerator;
+<?php namespace JuaGuz\ApiGenerator;
 
 use Illuminate\Http\Request;
 
