@@ -3,7 +3,8 @@ namespace JuaGuz\ApiGenerator;
 
 use Illuminate\Http\Request;
 
-use Input;
+use Illuminate\Support\Facades\Input;
+
 
 
 abstract class Api extends ApiController{

@@ -3,6 +3,7 @@ namespace JuaGuz\ApiGenerator;
 
 use Illuminate\Http\Response as IlluminateResponse;
 use App\Http\Controllers\Controller as Controller;
+use Illuminate\Support\Facades\Input;
 
 /**
  * Created by PhpStorm.
@@ -54,7 +55,7 @@ class ApiController extends Controller
 
     function __construct()
     {
-        $type = \Input::get('type','json');
+        $type = Input::get('type','json');
 
 
         $this->type = (in_array($type, $this->typesResponse)) ? $type :'json';
