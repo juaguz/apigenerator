@@ -1,13 +1,13 @@
 <?php 
-namespace JuaGuz\Apigenerator;
-use App\Microvoz\Interfaces\ApiModelInterface;
-use App\Microvoz\Transformers\BaseTransformer;
+namespace JuaGuz\ApiGenerator;
+
 use Illuminate\Http\Request;
+
 use Input;
 
-abstract class Api extends ApiController
-{
-	protected $model;
+
+abstract class Api extends ApiController{
+    protected $model;
     private $modelSearch;
     protected $transformer;
     private $relacionesValidas = [];
