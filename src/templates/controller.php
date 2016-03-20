@@ -2,7 +2,7 @@
 
 use App\Api\Entities\<?php echo $NAMESPACE ?>\<?php echo $MODEL ?> as Model;
 use App\Api\Transformers\<?php echo $MODEL ?>Transformer as Transformer;
-use JuaGuz\ApiGenerator\Clases\Api;
+use JuaGuz\ApiGenerator\Api;
 
 
 class <?php echo $NAME?>Controller extends Api

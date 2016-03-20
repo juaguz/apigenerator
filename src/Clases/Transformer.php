@@ -48,9 +48,13 @@ class Transformer extends Base
 	}
 
 	public function generatePath(){
+		$basePath = "Api/Transformers/";
+		if (!file_exists("app/".$basePath)) {
+    		mkdir("app/".$basePath, 0777, true);
+		}
 		
-
-		$this->path = "Api/Transformers/".$this->model."Transformer";
+		
+		$this->path = $basePath.$this->model."Transformer";
 		return $this->path;
 	}
 
