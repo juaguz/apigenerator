@@ -1,9 +1,10 @@
-<?php namespace JuaGuz\ApiGenerator;
+<?php 
+namespace JuaGuz\ApiGenerator;
 
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Input;
-
+use Illuminate\Support\Facades\Validator;
 
 
 abstract class Api extends ApiController{
@@ -99,7 +100,17 @@ abstract class Api extends ApiController{
     
     public function store(Request $request)
     {
-        $item = $this->model->create($request->all());
+
+        $rules = $this->model->getRules();
+
+        $data  = $request->all();
+
+        $valid = Validator::make($data,$rules,$this->model->getErrorMessage());
+
+        if($valid->fails()) return $this->respondInvalidEntity($valid->errors()->all());
+
+
+        $item = $this->model->create($data);
         return $this->respondCreated('Se ha creado con exito.',$item->getKey());
     }
     
@@ -123,6 +134,14 @@ abstract class Api extends ApiController{
         $model = $this->model->find($id);
 
         if(!$model) return $this->respondNotFound();
+
+        $rules = $this->model->getRules();
+
+        $data  = $request->all();
+
+        $valid = Validator::make($data,$rules,$this->model->getErrorMessage());
+
+        if($valid->fails()) return $this->respondInvalidEntity($valid->errors()->all());
 
         if(!$model->fill($request->all())->save()) return $this->respondWithError('Hubo un error al actualizar!');
         

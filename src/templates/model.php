@@ -12,5 +12,13 @@ class <?php echo $NAME ?> extends Model implements ApiModelInterface{
 	protected $table = '<?php echo $TABLENAME ?>';
 	protected $connection = '<?php echo $CONN ?>';
 
+	
+	public function getRules(){
+		return [];
+	}
+    public function getErrorMessage(){
+    	return [];
+    }
+
 
 }
