@@ -22,7 +22,9 @@ class Model extends Base
 
 	protected $db;
 
-    const TEMPLATE = '../templates/model.php';
+	private $template;
+
+
 
 
 	function __construct($connection,$model,$table)
@@ -31,6 +33,8 @@ class Model extends Base
 		$this->lConnection = strtolower($connection);
 		$this->model     = $model;
 		$this->table     = $table;
+
+		$this->template  = $this->template = sprintf("%s/templates/model.php",dirname(__DIR__));
 
 		$this->db 		 =  DB::connection($this->lConnection);
 
@@ -44,7 +48,7 @@ class Model extends Base
 	public function generate(){
 		$this->genFields();
 		$this->generateFillable();
-		$this->setFile(self::TEMPLATE);
+		$this->setFile($this->template);
 		$this->set("NAMESPACE",$this->namespace);
 		$this->set("NAME",$this->model);
 		$this->set("MODEL",$this->model);
@@ -112,7 +116,7 @@ class Model extends Base
 
 
 	public function generatePath(){
-		$basePath = "Microvoz/Entities/".$this->namespace;
+		$basePath = "Api/Entities/".$this->namespace;
 		if (!file_exists("app/".$basePath)) {
     		mkdir("app/".$basePath, 0777, true);
 		}

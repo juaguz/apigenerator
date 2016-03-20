@@ -1,7 +1,6 @@
 <?php 
 namespace JuaGuz\ApiGenerator\Clases;
 
-
 class Controller extends Base
 {
 	
@@ -9,18 +8,22 @@ class Controller extends Base
 
 	private $model;
 
-    const TEMPLATE = '../templates/controller.php';
+    private $template;
+
 
 
 	function __construct($connection,$model)
-	{
-		$this->model     = $model;
+    {
+        $this->model = $model;
+
+        $this->template = sprintf("%s/templates/controller.php",dirname(__DIR__));
+
 		parent::__construct($connection);	
 		
 	}
 
 	public function generate(){
-		$this->setFile(self::TEMPLATE);
+		$this->setFile($this->template);
 		
 		$this->set("NAMESPACE",$this->namespace);
 		$this->set("NAME",$this->model);

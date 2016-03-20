@@ -13,19 +13,20 @@ class Transformer extends Base
 
 	private $fields;
 
-    const TEMPLATE = '../templates/transformers.php';
 
+    private $template;
 
 	function __construct($connection,$model,$fields)
 	{
 		$this->model     = $model;
 		$this->fields    = $fields;
+		$this->template  = sprintf("%s/templates/transformers.php",dirname(__DIR__));
 		parent::__construct($connection);	
 		
 	}
 
 	public function generate(){
-		$this->setFile(self::TEMPLATE);
+		$this->setFile($this->template);
 		$this->genArray();
 		$this->set("NAME",$this->model);
 		$this->set("ARRAY",$this->array);
@@ -49,7 +50,7 @@ class Transformer extends Base
 	public function generatePath(){
 		
 
-		$this->path = "Microvoz/Transformers/".$this->model."Transformer";
+		$this->path = "Api/Transformers/".$this->model."Transformer";
 		return $this->path;
 	}
 

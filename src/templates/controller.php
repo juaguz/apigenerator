@@ -1,7 +1,7 @@
 <?php echo "<?php" ?> namespace App\Http\Controllers\Api\<?php echo $NAMESPACE ?>;
 
-use App\Microvoz\Entities\<?php echo $NAMESPACE ?>\<?php echo $MODEL ?> as Model;
-use App\Microvoz\Transformers\<?php echo $MODEL ?>Transformer as Transformer;
+use App\Api\Entities\<?php echo $NAMESPACE ?>\<?php echo $MODEL ?> as Model;
+use App\Api\Transformers\<?php echo $MODEL ?>Transformer as Transformer;
 use JuaGuz\ApiGenerator\Clases\Api;
 
 
