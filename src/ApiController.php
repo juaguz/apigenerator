@@ -107,6 +107,11 @@ class ApiController extends Controller
         return $this->setStatusCode(static::HTTP_NOT_FOUND)->respondWithError($message);
     }
 
+    public function respondInvalidEntity($message)
+    {
+        return $this->setStatusCode(static::HTTP_UNPROCESSABLE_ENTITY)->respondWithError($message);
+    }
+
     /**
      * @param string $message
      * @return mixed
