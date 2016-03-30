@@ -1,8 +1,10 @@
 <?php 
 namespace JuaGuz\ApiGenerator;
 
+use App\Api\Entities\Cinotecnia\AltasOperativasxolores;
+use Illuminate\Contracts\Validation\ValidationException;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 
@@ -23,6 +25,13 @@ abstract class Api extends ApiController{
         $this->model = $model;
         $this->transformer = $transformer;
         $relacionesValidas = $this->getRelacionesValidas();
+        
+
+    }
+
+    public function __destruct(){
+        
+
     }
 
 
@@ -80,7 +89,7 @@ abstract class Api extends ApiController{
     }
 
     public function getRelacionesValidas(){
-        return [];
+        
     }
 
     public function index()
@@ -104,7 +113,9 @@ abstract class Api extends ApiController{
     }
     
     public function store(Request $request)
-    {
+    {   
+        
+        DB::beginTransaction();
 
         $relationships = "relationships";
 
@@ -112,26 +123,48 @@ abstract class Api extends ApiController{
 
         $data  = $request->all();
 
-        $valid = Validator::make($data,$rules,$this->model->getErrorMessage());
+        #if(isset($data[$relationships]) and is_array($data[$relationships])) $this->saveRelationships($data[$relationships]);
 
-        if($valid->fails()) return $this->respondInvalidEntity($valid->errors()->all());
+        $valid = Validator::make($data,$rules);
 
+        if($valid->fails()) return $this->respondInvalidEntity($valid->errors()->all());                               
 
         $this->itemSave = $this->model->create($data);
+            
+        if(isset($data[$relationships]) and is_array($data[$relationships])){
+            $saveRelationships = $this->saveRelationships($data[$relationships]);
+            if(!$saveRelationships["success"]){
+                DB::rollback();
+                return $this->respondInvalidEntity($saveRelationships["errors"]);
+            }
+        } 
+        
+        DB::commit();
 
-        if(isset($data[$relationships]) and is_array($data[$relationships])) $this->saveRelationships($data[$relationships]);
+        return $this->respondCreated('Se ha creado con exito.',$this->itemSave->getKey());  
+        
 
-
-        return $this->respondCreated('Se ha creado con exito.',$this->itemSave->getKey());
     }
 
 
     private function saveRelationships($relaciones){
         foreach ($relaciones as $key => $values) {
-            foreach ($values as $value) {
-                $this->itemSave->{$key}->save($value)
+            foreach ($values as $keyRelation=>$value) {
+                foreach ($value as $value2) {
+                    $relation = $this->itemSave->{$keyRelation}();
+                    $className = get_class($relation->getRelated());
+                    $instanceOfClass = new $className($value2);
+                    $valid = Validator::make($value2,$instanceOfClass->getRules(),$instanceOfClass->getErrorMessage());                    
+
+                    
+                    if($valid->fails()) return ["success"=>false,"errors"=>$valid->errors()->all()];
+                    
+                    
+                    $relation->save($instanceOfClass);
+                }                
             }
         }
+        return ["success"=>true];
     }
 
     

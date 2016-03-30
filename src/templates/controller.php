@@ -15,6 +15,10 @@ class <?php echo $NAME?>Controller extends Api
         
     }
 
+    public function getRelacionesValidas(){
+        return [];
+    }
+
     
 }
 
