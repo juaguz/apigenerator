@@ -9,9 +9,14 @@ use Illuminate\Support\Facades\Validator;
 
 abstract class Api extends ApiController{
     protected $model;
+    
     private $modelSearch;
+    
     protected $transformer;
+    
     private $relacionesValidas = [];
+
+    protected $itemSave;
 
     public function __construct(ApiModelInterface $model,BaseTransformer $transformer){
         parent::__construct();
@@ -101,6 +106,8 @@ abstract class Api extends ApiController{
     public function store(Request $request)
     {
 
+        $relationships = "relationships";
+
         $rules = $this->model->getRules();
 
         $data  = $request->all();
@@ -110,9 +117,19 @@ abstract class Api extends ApiController{
         if($valid->fails()) return $this->respondInvalidEntity($valid->errors()->all());
 
 
-        $item = $this->model->create($data);
-        return $this->respondCreated('Se ha creado con exito.',$item->getKey());
+        $this->itemSave = $this->model->create($data);
+
+        if(isset($data[$relationships]) and is_array($data[$relationships])) $this->saveRelationships($data[$relationships]);
+
+
+        return $this->respondCreated('Se ha creado con exito.',$this->itemSave->getKey());
     }
+
+
+    private function saveRelationships(){
+        
+    }
+
     
     public function show($id)
     {
