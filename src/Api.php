@@ -126,8 +126,12 @@ abstract class Api extends ApiController{
     }
 
 
-    private function saveRelationships(){
-        
+    private function saveRelationships($relaciones){
+        foreach ($relaciones as $key => $values) {
+            foreach ($values as $value) {
+                $this->itemSave->{$key}->save($value)
+            }
+        }
     }
 
     
