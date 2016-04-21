@@ -96,9 +96,11 @@ abstract class Api extends ApiController{
     {
         
         $model = null;
-        $filters     = Input::except(["page","paginado","cantPage","relaciones"]);
+        $filters     = Input::except(["page","paginado","cantPage","relaciones","orderBy"]);
         $relaciones   = Input::get("relaciones",[]);
+        $orderBy   = Input::get("orderBy",[]);
         $this->relaciones($relaciones);
+        $this->orderBy($orderBy);
         $model = $this->filter($filters);
 
         if(empty($model)) return $this->respondNotFound();
@@ -172,7 +174,10 @@ abstract class Api extends ApiController{
     {
         $relaciones   = Input::get("relaciones",[]);
         $this->relaciones($relaciones);
+        $orderBy   = Input::get("orderBy",[]);
+        $this->orderBy($orderBy);
         $model = $this->model->find($id);
+        
 
         if(!$model) return $this->respondNotFound();
         //$configuracionesTransformer = $this->transformer->transform($model->toArray());
@@ -233,6 +238,11 @@ abstract class Api extends ApiController{
     private function containsFilters($relacion)
     {
         return explode('|',$relacion);
+    }
+    
+    protected function orderBy($orderBy)
+    {
+        foreach ($orderBy as $field=>$order) $this->model = $this->model->orderBy($field, $order);
     }
 
 
