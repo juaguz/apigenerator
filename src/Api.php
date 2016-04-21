@@ -1,7 +1,6 @@
 <?php 
 namespace JuaGuz\ApiGenerator;
 
-use App\Api\Entities\Cinotecnia\AltasOperativasxolores;
 use Illuminate\Contracts\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
