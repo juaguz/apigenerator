@@ -51,16 +51,23 @@ class ApiController extends Controller
     protected $type = self::RESPONSE_TYPE_JSON;
 
     protected $typesResponse = ["json","xml"];
+    protected $message;
 
     function __construct()
     {
         $type = Input::get('type','json');
-
-
         $this->type = (in_array($type, $this->typesResponse)) ? $type :'json';
-
     }
 
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    public function setMessage($message)
+    {
+        $this->message = $message;
+    }
 
     /**
      * @param mixed $type
@@ -118,6 +125,7 @@ class ApiController extends Controller
      */
     public function respondInternalError($message = 'Internal Error!')
     {
+        $message = (!$this->message) ?$message:$this->message;
         return $this->setStatusCode(static::HTTP_INTERNAL_SERVER_ERROR)->respondWithError($message);
     }
 
@@ -191,9 +199,4 @@ class ApiController extends Controller
 
         return $this->setStatusCode(static::HTTP_CREATED)->respond($data);
     }
-
-
-
-
-
-} 
+}
