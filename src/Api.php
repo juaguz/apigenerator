@@ -31,7 +31,7 @@ abstract class Api extends ApiController{
     public function __destruct(){}
 
     protected function whereLike($key,$value){
-        return $this->model->where($key,'like',$value."%");
+        return $this->model->where($key,'like',"%".$value."%");
     }
 
     protected function whereEquals($key,$value){
