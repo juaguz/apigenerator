@@ -2,7 +2,7 @@
 
 namespace JuaGuz\ApiGenerator;
 
-interface ApiRelationsInterface
+interface RelationsInterface
 {
     public function searchRelations($relations, $fields, &$model);
     public function checkRelationWithFilters($relation);
