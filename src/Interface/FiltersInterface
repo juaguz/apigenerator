@@ -2,7 +2,7 @@
 
 namespace JuaGuz\ApiGenerator\Interface;
 
-interface ApiFiltersInterface
+interface FiltersInterface
 {
     public function processFilter($fields, &$model);
     public function setModel($model);
