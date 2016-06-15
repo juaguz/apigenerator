@@ -7,160 +7,55 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
+use JuaGuz\ApiGenerator\Clases\Filters;
+use JuaGuz\ApiGenerator\Clases\Relations;
 
 
-abstract class Api extends ApiController{
+abstract class Api extends ApiController
+{
 
     protected $model;
 
-    private $modelSearch;
-
     protected $transformer;
-
-    private $tiposBusquedas = [
-        "~"=>"LIKE",
-        "-"=>"!=",
-        ")"=>">",
-        "]"=>">=",
-        "("=>"<",
-        "["=>"<=",
-    ];
 
     protected $itemSave;
 
-    const EXPLODE_PARSE_FIELDS_VALUES = "|";
+    private $relations;
 
-    const EXPLODE_PARSE_FIELD_VALUE = ":";
+    private $filters;
 
-    const SEARCH_DEFAULT_OPERATOR = "=";
 
-    public function __construct(ApiModelInterface $model,BaseTransformer $transformer){
+    public function __construct(
+        ApiModelInterface $model,
+        BaseTransformer $transformer)
+    {
         parent::__construct();
         $this->model = $model;
         $this->transformer = $transformer;
-        $relacionesValidas = $this->getRelacionesValidas();
+        $this->relations = new Relations();
+        $this->filters = new Filters();
     }
 
     public function __destruct(){}
 
-    protected function whereLike($key,$value){
-        return $this->model->where($key,'like',"%".$value."%");
-    }
-
-    protected function whereEquals($key,$value){
-        return $this->model->where($key, self::SEARCH_DEFAULT_OPERATOR,$value);
-    }
-
-    protected function whereMinor($key,$value){
-        return $this->model->where($key,'<',$value);
-    }
-
-    protected function whereLessequals($key,$value){
-        return $this->model->where($key,'<=',$value);
-    }
-
-    protected function whereHigher($key,$value){
-        return $this->model->where($key,'>',$value);
-    }
-
-    protected function whereMoreEquals($key,$value){
-        return $this->model->where($key,'>=',$value);
-    }
-
-    protected function whereDiff($key,$value){
-        return $this->model->where($key,'!=',$value);
-    }
-
-    protected function search($filters,$filterName){
-
-        foreach ($filters as $key => $value) {
-            $method = "where" . ucfirst($filterName);
-            $this->model = call_user_func_array([$this, $method],array($key,$value));
-        }
-
-    }
-
-    protected function filter(&$filters){
-        $model = null;
-        array_walk($filters,[$this,"search"]);
-        $this->model = $this->model->distinct();
-        return $this->model->get();
-    }
-
-
-    protected function busquedaRelaciones($relacion,$fields){
-
-        $fieldsAndValues = explode(self::EXPLODE_PARSE_FIELDS_VALUES, $fields);
-
-        foreach($fieldsAndValues as $value)
-        {
-            $data = explode(self::EXPLODE_PARSE_FIELD_VALUE, $value);
-            $searchField = $data[0];
-            $value = $data[1];
-
-            list($searchOperator, $searchValue) = $this->parseOperatorAndValue($value);
-
-            $this->model = $this->model->whereHas($relacion,function($q) use($searchValue,$searchOperator,$searchField){
-                if($searchOperator =="LIKE") $searchValue = "%$searchValue%";
-                $q->where($searchField,$searchOperator,$searchValue);
-            });
-        }
-
-        return $this->model->with($relacion);
-    }
-
-
-    protected function parseRelacion($relacion){
-        $relacion =  explode(".", $relacion);
-
-        return $relacion;
-    }
-
-    protected function relaciones($relaciones){
-        $relacionesValidas = $this->getRelacionesValidas();
-        try {
-            foreach ($relaciones as $relacion) {
-                $relacion  = $this->checkRelacionWithFilters($relacion);
-
-                $in_array = in_array($relacion[0], $relacionesValidas);
-                $in_array1 = in_array($relacion, $relacionesValidas);
-
-                if( $in_array or $in_array1){
-
-                    if(is_array($relacion))
-                    {
-                        if(isset($relacion[2])){
-                            $this->model  = $this->busquedaRelaciones($relacion[0],$relacion[1].".".$relacion[2]);
-                        }else{
-                            $this->model  = $this->busquedaRelaciones($relacion[0],$relacion[1]);
-                        }
-
-                    }else{
-                        $this->model = $this->model->with($relacion);
-                    }
-                }
-            }
-            return true;
-        } catch( ErrorException $e) {
-            $this->setMessage($e->getMessage());
-        }
-        return false;
-    }
-
-    abstract function getRelacionesValidas();
-
     public function index()
     {
         $model = null;
-        $filters     = Input::except(["page","paginado","cantPage","relaciones","orderBy"]);
+        $filter     = Input::except(["page","paginado","cantPage","relaciones","orderBy","filters"]);
+
+        $filters   = Input::get("filters",[]);
+        if(!empty($filters))
+            if(!$this->filters($filters)) return $this->respondInternalError();
 
         $relaciones   = Input::get("relaciones",[]);
-        if(!$this->relaciones($relaciones)) return $this->respondInternalError();
+        if(!empty($relaciones))
+            if(!$this->relations($relaciones)) return $this->respondInternalError();
 
         $orderBy   = Input::get("orderBy",[]);
-        if(!$this->orderBy($orderBy)) return $this->respondInternalError();
+        if(!empty($orderBy))
+            if(!$this->orderBy($orderBy)) return $this->respondInternalError();
 
-        $model = $this->filter($filters);
+        $model = $this->filter($filter);
         if(empty($model)) return $this->respondNotFound();
 
         $data = [
@@ -168,6 +63,30 @@ abstract class Api extends ApiController{
             'error' => false
         ];
 
+        return $this->respond($data);
+    }
+
+    public function show($id)
+    {
+        $filters   = Input::get("filters",[]);
+        if(!empty($filters))
+            if(!$this->filters($filters_A)) return $this->respondInternalError();
+
+        $relaciones   = Input::get("relaciones",[]);
+        if(!empty($relaciones))
+            if(!$this->relations($relaciones)) return $this->respondInternalError();
+
+        $orderBy   = Input::get("orderBy",[]);
+        if(!empty($orderBy))
+            if(!$this->orderBy($orderBy)) return $this->respondInternalError();
+
+        $model = $this->model->find($id);
+        if(!$model) return $this->respondNotFound();
+        //$configuracionesTransformer = $this->transformer->transform($model->toArray());
+        $data = [
+            'data' => $model,
+            'error' => false
+        ];
         return $this->respond($data);
     }
 
@@ -194,40 +113,6 @@ abstract class Api extends ApiController{
         DB::commit();
 
         return $this->respondCreated('Se ha creado con exito.',$this->itemSave->getKey());
-    }
-
-    private function saveRelationships($relaciones){
-        foreach ($relaciones as $key => $values) {
-            foreach ($values as $keyRelation=>$value) {
-                foreach ($value as $value2) {
-                    $relation = $this->itemSave->{$keyRelation}();
-                    $className = get_class($relation->getRelated());
-                    $instanceOfClass = new $className($value2);
-                    $valid = Validator::make($value2,$instanceOfClass->getRules(),$instanceOfClass->getErrorMessage());
-                    if($valid->fails()) return ["success"=>false,"errors"=>$valid->errors()->all()];
-                    $relation->save($instanceOfClass);
-                }
-            }
-        }
-        return ["success"=>true];
-    }
-
-    public function show($id)
-    {
-        $relaciones   = Input::get("relaciones",[]);
-        if(!$this->relaciones($relaciones)) return $this->respondInternalError();
-
-        $orderBy   = Input::get("orderBy",[]);
-        if(!$this->orderBy($orderBy)) return $this->respondInternalError();
-
-        $model = $this->model->find($id);
-        if(!$model) return $this->respondNotFound();
-        //$configuracionesTransformer = $this->transformer->transform($model->toArray());
-        $data = [
-            'data' => $model,
-            'error' => false
-        ];
-        return $this->respond($data);
     }
 
     public function update(Request $request,$id)
@@ -276,44 +161,106 @@ abstract class Api extends ApiController{
 
     }
 
-    /**
-     * @param $relacion
-     * @return array
-     */
-    protected function checkRelacionWithFilters($relacion)
-    {
-        $existeFiltrarEnCampo = strpos($relacion, self::EXPLODE_PARSE_FIELD_VALUE) !== false;
-        $existeCampo = strpos($relacion, ".") !== false;
-
-        return ($existeFiltrarEnCampo and $existeCampo) ? $this->parseRelacion($relacion) : $relacion;
+    private function saveRelationships($relaciones){
+        foreach ($relaciones as $key => $values) {
+            foreach ($values as $keyRelation=>$value) {
+                foreach ($value as $value2) {
+                    $relation = $this->itemSave->{$keyRelation}();
+                    $className = get_class($relation->getRelated());
+                    $instanceOfClass = new $className($value2);
+                    $valid = Validator::make($value2,$instanceOfClass->getRules(),$instanceOfClass->getErrorMessage());
+                    if($valid->fails()) return ["success"=>false,"errors"=>$valid->errors()->all()];
+                    $relation->save($instanceOfClass);
+                }
+            }
+        }
+        return ["success"=>true];
     }
 
-    protected function parseOperatorAndValue($value)
-    {
-        $searchOperator = self::SEARCH_DEFAULT_OPERATOR;
-        $indexOperator = $value[0];
-        $existeElOperadorDeBusqueda = array_key_exists($indexOperator, $this->tiposBusquedas);
+    protected function whereLike($key,$value){
+        return $this->model->where($key,'like',"%".$value."%");
+    }
 
-        if ($existeElOperadorDeBusqueda) {
-            $searchOperator = $this->tiposBusquedas[$indexOperator];
-            $value = $this->getStringAfterPattern($indexOperator, $value);
+    protected function whereEquals($key,$value){
+        return $this->model->where($key, "=",$value);
+    }
+
+    protected function whereMinor($key,$value){
+        return $this->model->where($key,'<',$value);
+    }
+
+    protected function whereLessequals($key,$value){
+        return $this->model->where($key,'<=',$value);
+    }
+
+    protected function whereHigher($key,$value){
+        return $this->model->where($key,'>',$value);
+    }
+
+    protected function whereMoreEquals($key,$value){
+        return $this->model->where($key,'>=',$value);
+    }
+
+    protected function whereDiff($key,$value){
+        return $this->model->where($key,'!=',$value);
+    }
+
+    protected function search($filters,$filterName){
+
+        foreach ($filters as $key => $value) {
+            $method = "where" . ucfirst($filterName);
+            $this->model = call_user_func_array([$this, $method],array($key,$value));
         }
 
-        return array($searchOperator, $value);
     }
 
-    private function getStringAfterPattern($string, $inthat)
-    {
-        if (!is_bool(strpos($inthat, $string)))
-            return substr($inthat, strpos($inthat,$string)+strlen($string));
+    protected function filter(&$filters){
+        $model = null;
+        array_walk($filters,[$this,"search"]);
+        $this->model = $this->model->distinct();
+        return $this->model->get();
     }
 
-    private function containsFilters($relacion)
-    {
-        return explode(self::EXPLODE_PARSE_FIELDS_VALUES,$relacion);
+    protected function relations(&$relations){
+
+        $relacionesValidas = $this->getValidRelations();
+
+        try {
+
+            foreach ($relations as $relation) {
+
+                $relation  = $this->relations->checkRelationWithFilters($relation);
+                $in_array = in_array($relation[0], $relacionesValidas);
+                $in_array1 = in_array($relation, $relacionesValidas);
+
+                if( $in_array or $in_array1){
+
+                    if(is_array($relation))
+                    {
+                        if(isset($relation[2])){
+                            $this->model  = $this->relations->searchRelations($relation[0],$relation[1].".".$relation[2],$this->model);
+                        }else{
+                            $this->model  = $this->relations->searchRelations($relation[0],$relation[1],$this->model);
+                        }
+
+                    }else{
+                        $this->model = $this->model->with($relation);
+                    }
+                }
+            }
+
+            return true;
+
+        } catch( ErrorException $e) {
+            $this->setMessage($e->getMessage());
+        }
+
+        return false;
     }
 
-    protected function orderBy($orderBy)
+    abstract function getValidRelations();
+
+    protected function orderBy(&$orderBy)
     {
         try {
             foreach ($orderBy as $field=>$order) $this->model = $this->model->orderBy($field, $order);
@@ -321,6 +268,19 @@ abstract class Api extends ApiController{
         } catch( ErrorException $e) {
             $this->setMessage($e->getMessage());
         }
+
+        return false;
+    }
+
+    private function filters(&$filters)
+    {
+        try {
+            foreach ($filters as $filter) $this->model  = $this->filters->processFilter($filter,$this->model);
+            return true;
+        } catch( ErrorException $e) {
+            $this->setMessage($e->getMessage());
+        }
+
         return false;
     }
 
