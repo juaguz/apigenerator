@@ -1,6 +1,6 @@
 <?php
 
-namespace JuaGuz\ApiGenerator\Interface;
+namespace JuaGuz\ApiGenerator\Contracts;
 
 interface RelationsInterface
 {
