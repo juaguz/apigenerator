@@ -5,5 +5,4 @@ namespace JuaGuz\ApiGenerator\Interface;
 interface FiltersInterface
 {
     public function processFilter($fields, &$model);
-    public function setModel($model);
 }
