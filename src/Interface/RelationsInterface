@@ -6,5 +6,4 @@ interface RelationsInterface
 {
     public function searchRelations($relations, $fields, &$model);
     public function checkRelationWithFilters($relation);
-    public function setModel($model);
 }
