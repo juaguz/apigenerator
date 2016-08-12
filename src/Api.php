@@ -41,7 +41,7 @@ abstract class Api extends ApiController
     public function index()
     {
         $model = null;
-        $filter     = Input::except(["page","paginado","cantPage","relaciones","orderBy","filters"]);
+        $filter     = Input::except(["page","paginado","cantPage","relaciones","orderBy","filters","methodFilter"]);
 
         $filters   = Input::get("filters",[]);
         if(!empty($filters))
@@ -55,7 +55,9 @@ abstract class Api extends ApiController
         if(!empty($orderBy))
             if(!$this->orderBy($orderBy)) return $this->respondInternalError();
 
-        $model = $this->filter($filter);
+        $methodFilter = Input::get("methodFilter",'filter');
+        $model = call_user_func_array([$this,$methodFilter],[&$filter]);
+        
         if(empty($model)) return $this->respondNotFound();
 
         $data = [
