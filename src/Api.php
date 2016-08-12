@@ -215,6 +215,14 @@ abstract class Api extends ApiController
         }
 
     }
+    
+    protected function filterWithPaginate(&$filters){
+        $model = null;
+        array_walk($filters,[$this,"search"]);
+        $this->model = $this->model->distinct();
+        return $this->model->paginate(30);
+
+    }
 
     protected function filter(&$filters){
         $model = null;
