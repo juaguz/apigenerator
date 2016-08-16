@@ -220,7 +220,8 @@ abstract class Api extends ApiController
         $model = null;
         array_walk($filters,[$this,"search"]);
         $this->model = $this->model->distinct();
-        return $this->model->paginate(30);
+        $cantRecords = env('APIGENERATE_CANT_RECORDS_PAGINATE',30);
+        return $this->model->paginate($cantRecords);
 
     }
 
